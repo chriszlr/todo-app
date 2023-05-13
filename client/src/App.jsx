@@ -1,35 +1,97 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [todos, setTodos] = useState([]);
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    const getAllTodods = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/todos/all-todos"
+        );
+
+        setTodos(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getAllTodods();
+  }, []);
+
+  const submitTodo = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post("http://localhost:8000/api/todos/new-todo", {
+        title,
+        description,
+      });
+
+      setTodos([...todos, res.data]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteTodo = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/todos/delete-todo/${id}`);
+
+      setTodos(todos.filter((todo) => todo._id !== id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      <h1>My Todo App</h1>
 
-export default App
+      <form>
+        <label htmlFor="title">Title:</label>
+        <input
+          type="text"
+          name="title"
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <br />
+        <label htmlFor="description">Description:</label>
+        <input
+          type="text"
+          name="description"
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <br />
+
+        <button onClick={submitTodo}>Add Todo</button>
+      </form>
+
+      <h3>Current Todos:</h3>
+
+      <ul>
+        {todos.map((todo, index) => (
+          <li key={index}>
+            <h4>{todo.title}</h4>
+            <p>{todo.description}</p>
+
+            <button onClick={() => deleteTodo(todo._id)}>Delete</button>
+            <hr />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default App;

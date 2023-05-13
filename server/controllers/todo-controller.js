@@ -4,7 +4,7 @@ const getAllTodos = async (req, res) => {
   try {
     const todos = await Todo.find();
 
-    res.status(200).json({ todos });
+    res.status(200).json(todos);
   } catch (error) {
     console.log(error);
   }
@@ -16,7 +16,7 @@ const createTodo = async (req, res) => {
 
     const savedTodo = await newTodo.save();
 
-    res.status(200).json({ savedTodo });
+    res.status(200).json(savedTodo);
   } catch (error) {
     console.log(error);
   }
@@ -28,7 +28,7 @@ const updateTodoById = async (req, res) => {
       new: true,
     });
 
-    res.status(200).json({ updatedTodo });
+    res.status(200).json(updatedTodo);
   } catch (error) {
     console.log(error);
   }
